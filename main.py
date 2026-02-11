@@ -1,50 +1,50 @@
 import os
+import shutil  # Added for moving files
 
 def main():
     
-    # 1. Define the Dictionary (The "Rules")
-    # This maps folder names to lists of file extensions.
     EXTENSION_MAP = {
-        'Images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg'],
-        'Documents': ['.pdf', '.docx', '.txt', '.xlsx', '.pptx', '.csv'],
-        'Audio': ['.mp3', '.wav', '.aac', '.flac'],
-        'Videos': ['.mp4', '.mov', '.avi', '.mkv'],
-        'Archives': ['.zip', '.rar', '.7z', '.tar'],
-        'Installers': ['.exe', '.msi', '.dmg', '.pkg']
+        'Images': ['.jpg', '.jpeg', '.png', '.gif'],
+        'Documents': ['.pdf', '.docx', '.txt'],
+        'Audio': ['.mp3', '.wav'],
+        'Videos': ['.mp4', '.mov'],
+        'Archives': ['.zip', '.rar']
     }
 
-    # 2. Getting User Input
-    # We ask for the path and verify it exists to prevent errors.
-    print("--- TidyByte: File Organizer (Development Mode) ---")
     target_folder = input("Please enter the path of the folder to organize: ")
 
     if os.path.exists(target_folder):
-        print(f"\n[SUCCESS] Path found: {target_folder}")
-        print("Checking for files...")
-        
-        # 3. Scan the directory
-        # We list all items and separate files from folders.
         all_items = os.listdir(target_folder)
         files_found = [f for f in all_items if os.path.isfile(os.path.join(target_folder, f))]
         
-        print(f"Total files detected: {len(files_found)}")
-        
-        # 4. Dry Run Logic (Identify categories without moving yet)
+        print(f"Moving {len(files_found)} files...")
+
         for file in files_found:
-            name, ext = os.path.splitext(file)
-            ext = ext.lower()
+            file_path = os.path.join(target_folder, file)
+            ext = os.path.splitext(file)[1].lower()
             
-            # Find the category
+            # Determining the category
             category_found = "Others"
             for category, extensions in EXTENSION_MAP.items():
                 if ext in extensions:
                     category_found = category
                     break
             
-            print(f"File: {file} -> Target Category: {category_found}")
+            
+            #Creating the destination folder path
+            dest_dir = os.path.join(target_folder, category_found)
+            
+            # Making the folder if it doesn't exist yet
+            if not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
+            
+            # Moving the file
+            shutil.move(file_path, os.path.join(dest_dir, file))
+            print(f" [OK] Moved {file} to {category_found}/")
 
+        print("\nOrganization complete!")
     else:
-        print("[ERROR] The path provided does not exist. Please check and try again.")
+        print("[ERROR] Path not found.")
 
 if __name__ == "__main__":
     main()
