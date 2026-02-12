@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
@@ -17,6 +18,8 @@ def run_organizer_logic(target_folder):
         'Archives': ['.zip', '.rar', '.7z', '.tar'],
         'Installers': ['.exe', '.msi', '.dmg', '.pkg']
     }
+    current_time = time.time()
+    seconds_in_180_days = 180 * 24 * 60 * 60
 
     # Listing all items in the directory
     all_items = os.listdir(target_folder)
@@ -25,7 +28,14 @@ def run_organizer_logic(target_folder):
 
     for file in files_to_move:
         source_path = os.path.join(target_folder, file)
-        _, ext = os.path.splitext(file)
+        file_mod_time = os.path.getmtime(source_path) # Get last modified timestamp
+        file_age_seconds = current_time - file_mod_time
+
+        if file_age_seconds > seconds_in_180_days:
+            # If old, assign to Archive folder
+            category = "Archive"
+        else:
+            _, ext = os.path.splitext(file)
         ext = ext.lower()
 
         # Identifying category
