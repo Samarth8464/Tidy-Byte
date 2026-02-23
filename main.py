@@ -32,8 +32,14 @@ def run_organizer_logic(target_folder):
         file_age_seconds = current_time - file_mod_time
 
         if file_age_seconds > seconds_in_180_days:
-            # If old, assign to Archive folder
-            category = "Archive"
+            # Converting the timestamp to a Year and Month name
+            date_obj = datetime.fromtimestamp(file_mod_time)
+            year = date_obj.strftime('%Y')       # e.g., '2023'
+            month = date_obj.strftime('%B')      # e.g., 'January'
+            
+            # Create a nested path: Archive/2023/January
+            dest_folder = os.path.join(target_folder, "Archive", year, month)
+        
         else:
             _, ext = os.path.splitext(file)
         ext = ext.lower()
